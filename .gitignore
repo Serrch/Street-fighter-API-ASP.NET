@@ -1,0 +1,75 @@
+# Build directories
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.vsp
+*.vs/
+.vscode/
+*.dotCover
+
+# NuGet packages
+*.nupkg
+packages/
+# The project.lock.json file is obsolete in .NET Core, but in case
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Core files
+appsettings*.json
+secrets.json
+
+# Logs
+*.log
+Logs/
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Node.js / front-end
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Visual Studio cache files
+*.cache
+*.dbmdl
+*.bak
+*.Backup
+*.resharper
+*.resharper.user
+*.DotSettings.user
+
+# Publish / deployment outputs
+publish/
+*.publishsettings
+*.azurePubxml
+*.pubxml
+*.pubxml.user
+
+# IIS / local server
+*.vspscc
+*.vssscc
+_ReSharper*/
+_ReSharper*/
+*_i.c
+*_p.c
+*_h.h
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+*.vsmdi
+
+# Others
+*.sln.docstates
