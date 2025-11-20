@@ -14,10 +14,8 @@ namespace SF_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -27,10 +25,10 @@ namespace SF_API
             builder.Services.AddScoped<IFighterService, FighterService>();
             builder.Services.AddScoped<IGameService, GameService>();
             builder.Services.AddScoped<IFighterVersionService, FighterVersionService>();
+            builder.Services.AddScoped<IFighterMoveService, FighterMoveService>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
