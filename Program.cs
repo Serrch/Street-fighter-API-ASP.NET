@@ -26,7 +26,7 @@ namespace SF_API
             builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddScoped<IFighterService, FighterService>();
             builder.Services.AddScoped<IGameService, GameService>();
-
+            builder.Services.AddScoped<IFighterVersionService, FighterVersionService>();
 
             var app = builder.Build();
 
