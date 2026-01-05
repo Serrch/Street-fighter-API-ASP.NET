@@ -3,6 +3,7 @@ using SF_API.DTOs.Fighter;
 using SF_API.DTOs.FighterMove;
 using SF_API.DTOs.FighterVersion;
 using SF_API.DTOs.Game;
+using SF_API.DTOs.Image;
 using SF_API.Models;
 
 namespace SF_API.Utils
@@ -17,6 +18,7 @@ namespace SF_API.Utils
             CreateMap<UpdateFighterVersionDTO, FighterVersion>();
             CreateMap<CreateFighterMoveDTO, FighterMove>();
             CreateMap<UpdateFighterMoveDTO, FighterMove>();
+            CreateMap<CreateImageDTO, Image>();
         
 
         }

@@ -57,5 +57,10 @@
             return new ServiceResult<T> { Success = false, Message = $"La ID: {id} no corresponde a algun {fieldName}", ErrorType = ErrorType.NotFound };
         }
 
+        public static ServiceResult<T> FailActionExcepcion(string action, string fieldName)
+        {
+            return new ServiceResult<T> { Success = false, Message = $"Ocurrio una excepcion al intentar {action} el {fieldName}", ErrorType = ErrorType.ActionError };
+        }
+
     }
 }

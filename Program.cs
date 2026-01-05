@@ -5,6 +5,7 @@ using SF_API.Data;
 using SF_API.Interfaces;
 using SF_API.Services;
 using SF_API.Utils;
+using System.Text.Json.Serialization;
 
 namespace SF_API
 {
@@ -14,7 +15,10 @@ namespace SF_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -26,6 +30,7 @@ namespace SF_API
             builder.Services.AddScoped<IGameService, GameService>();
             builder.Services.AddScoped<IFighterVersionService, FighterVersionService>();
             builder.Services.AddScoped<IFighterMoveService, FighterMoveService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
 
             var app = builder.Build();
 

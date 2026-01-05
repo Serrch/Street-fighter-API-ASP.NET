@@ -17,7 +17,7 @@ namespace SF_API.Controllers
         {
             _fighterMoveService = fighterMoveService;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetFighterMovesAsync()
         {
@@ -27,7 +27,6 @@ namespace SF_API.Controllers
 
             return Ok(RespuestaFactory.Ok(result.Message, result.Data));
         }
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFighterMoveById(int id)
