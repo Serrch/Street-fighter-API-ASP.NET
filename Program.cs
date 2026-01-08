@@ -41,7 +41,8 @@ namespace SF_API
             }
 
             app.UseHttpsRedirection();
-            
+            app.UseStaticFiles();
+
             app.UseAuthorization();
 
             app.UseExceptionMiddleware();
