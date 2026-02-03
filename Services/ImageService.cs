@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SF_API.Common;
 using SF_API.Data;
@@ -14,21 +15,28 @@ namespace SF_API.Services
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private IWebHostEnvironment _env;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ImageService(AppDbContext context, IMapper mapper, IWebHostEnvironment env)
+
+        public ImageService(AppDbContext context, IMapper mapper, IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
             _env = env;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResult<Image>> GetByIdAsync(int id)
         {
-            Image? imageById = await _context.Images.FindAsync(id);
+            Image? imageById = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
 
             if(imageById == null) return ServiceResult<Image>.FailIdNotFound("imagen",id);
 
-            return ServiceResult<Image>.OkFinded(imageById, "imagen");
+            string Path = createUrlImage(imageById.ImagePath);
+
+            imageById.ImagePath = Path;
+
+            return ServiceResult<Image>.Ok(imageById, "Imagen obtenida con exito");
         }
 
         public async Task<ServiceResult<Image>> AddAsync(CreateImageDTO imageDTO)
@@ -65,7 +73,7 @@ namespace SF_API.Services
 
         public async Task<ServiceResult<Image>> UpdateAsync(int id, CreateImageDTO updatedImage)
         {
-            Image? image = await _context.Images.FindAsync(id);
+            Image? image = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
 
             if (image == null)
                 return ServiceResult<Image>.FailIdNotFound("imagen", id);
@@ -105,7 +113,7 @@ namespace SF_API.Services
 
         public async Task<ServiceResult<bool>> DeleteByIdAsync(int id)
         {
-            Image? image = await _context.Images.FindAsync(id);
+            Image? image = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
 
             if (image == null)
                 return ServiceResult<bool>.FailIdNotFound("imagen", id);
@@ -260,6 +268,19 @@ namespace SF_API.Services
                 EntityType.FighterMove => await _context.FighterMoves.AnyAsync(fm => fm.IdFighterMove == entity.EntityId),
                 _ => false
             };
+        }
+
+        private string createUrlImage(string imagePath)
+        {
+            var request = _httpContextAccessor.HttpContext?.Request;
+            string relativePath = "/" + imagePath.Replace('\\', '/');
+
+            if (request != null)
+            {
+                return $"{request.Scheme}://{request.Host}{relativePath}";
+            }
+
+            return relativePath; 
         }
     }
 

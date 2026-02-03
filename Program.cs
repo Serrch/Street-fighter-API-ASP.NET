@@ -21,6 +21,7 @@ namespace SF_API
             });
 
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

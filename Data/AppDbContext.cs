@@ -38,6 +38,14 @@ namespace SF_API.Data
                 .HasForeignKey(fm => fm.IdFighterVersion)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Image>()
+                .Property(i => i.EntityType)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Image>()
+                .Property(i => i.ImageType)
+                .HasConversion<string>();
+
             base.OnModelCreating(modelBuilder);
         }
 
