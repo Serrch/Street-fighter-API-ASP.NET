@@ -23,9 +23,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<List<FighterMove>> result = await _fighterMoveService.GetAllAsync();
 
-            if (!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpGet("{id}")]
@@ -33,9 +31,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<FighterMove> result = await _fighterMoveService.GetByIdAsync(id);
 
-            if (!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpPost]
@@ -43,9 +39,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<FighterMove> result = await _fighterMoveService.AddAsync(createFighterMove);
 
-            if (!result.Success) return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpPut]
@@ -53,13 +47,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<FighterMove> result = await _fighterMoveService.UpdateAsync(id, updateFighterMove);
 
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound();
-
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpDelete("{id}")]
@@ -67,13 +55,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<FighterMove> result = await _fighterMoveService.DeleteAsync(id);
 
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
 

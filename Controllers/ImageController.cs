@@ -23,9 +23,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<Image> result = await _imageService.GetByIdAsync(id);
 
-            if(!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404)); 
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpPost]
@@ -33,9 +31,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<Image> result = await _imageService.AddAsync(createImage);
 
-            if (!result.Success) return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpPut("{id}")]
@@ -43,27 +39,14 @@ namespace SF_API.Controllers
         {
             ServiceResult<Image> result = await _imageService.UpdateAsync(id, updateImage);
 
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-
-            }
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteImageAsync(int id)
         {
             ServiceResult<bool> result = await _imageService.DeleteByIdAsync(id);
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
 

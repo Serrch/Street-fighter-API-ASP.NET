@@ -3,7 +3,6 @@ using SF_API.Common;
 using SF_API.DTOs.Fighter;
 using SF_API.Interfaces;
 using SF_API.Models;
-using SF_API.Utils;
 
 namespace SF_API.Controllers
 {
@@ -22,9 +21,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<List<Fighter>> result = await _fighterService.GetAllAsync();
 
-            if (!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpGet("{id}")]
@@ -32,9 +29,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<Fighter> result = await _fighterService.GetByIdAsync(id);
 
-            if (!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
 
         }
 
@@ -43,9 +38,7 @@ namespace SF_API.Controllers
         {
             ServiceResult<Fighter> result = await _fighterService.AddAsync(createFighter);
 
-            if (!result.Success) return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpPut("{id}")]
@@ -53,27 +46,14 @@ namespace SF_API.Controllers
         {
             ServiceResult<Fighter> result = await _fighterService.UpdateAsync(id, updateFighter);
 
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-
-            }
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFighterAsync(int id)
         {
             ServiceResult<Fighter> result = await _fighterService.DeleteAsync(id);
-            if (!result.Success)
-            {
-                if(result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
         }
 
     }

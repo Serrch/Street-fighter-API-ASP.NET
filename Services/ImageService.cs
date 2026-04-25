@@ -7,6 +7,7 @@ using SF_API.DTOs.Image;
 using SF_API.Interfaces;
 using SF_API.Models;
 using SF_API.Utils;
+using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace SF_API.Services
 {
@@ -41,6 +42,10 @@ namespace SF_API.Services
 
         public async Task<ServiceResult<Image>> AddAsync(CreateImageDTO imageDTO)
         {
+            string? validateImg = await ValidateImageAsync(imageDTO);
+
+            if (validateImg != null) return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
+
             bool exist = await entityExist(imageDTO);
 
             if (!exist) return ServiceResult<Image>.FailAction("crear", "imagen");
@@ -73,6 +78,11 @@ namespace SF_API.Services
 
         public async Task<ServiceResult<Image>> UpdateAsync(int id, CreateImageDTO updatedImage)
         {
+            string? validateImg = await ValidateImageAsync(updatedImage);
+
+            if (validateImg != null)
+                return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
+
             Image? image = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
 
             if (image == null)
@@ -281,6 +291,42 @@ namespace SF_API.Services
             }
 
             return relativePath; 
+        }
+
+
+        private async Task<string?> ValidateImageAsync(CreateImageDTO imageDto)
+        {
+            if (imageDto.Image == null || imageDto.Image.Length == 0)
+                return "No se recibió ninguna imagen válida";
+
+            const long maxSize = 5 * 1024 * 1024;
+            if (imageDto.Image.Length > maxSize)
+                return "La imagen excede el tamaño permitido (5MB)";
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(imageDto.Image.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(extension))
+                return "Extensión de archivo no permitida";
+
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+
+            if (!allowedTypes.Contains(imageDto.Image.ContentType))
+                return "Formato de imagen no permitido";
+
+            try
+            {
+                using var stream = imageDto.Image.OpenReadStream();
+                using var image = await ImageSharpImage.LoadAsync(stream);
+                if (image.Width > 5000 || image.Height > 5000)
+                    return "La imagen es demasiado grande en dimensiones";
+            }
+            catch
+            {
+                return "El archivo no es una imagen válida";
+            }
+
+            return null;
         }
     }
 

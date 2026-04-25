@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SF_API.Common;
-using SF_API.DTOs.Fighter;
 using SF_API.DTOs.Game;
 using SF_API.Interfaces;
 using SF_API.Models;
-using SF_API.Services;
 using SF_API.Utils;
 
 namespace SF_API.Controllers
@@ -24,10 +22,9 @@ namespace SF_API.Controllers
         public async Task<IActionResult> GetGamesAsync()
         {
             ServiceResult<List<Game>> result = await _gameService.GetAllAsync();
-            
-            if(!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
 
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+            return StatusCode(result.Status, result);
+
         }
 
         [HttpGet("{id}")]
@@ -35,9 +32,8 @@ namespace SF_API.Controllers
         {
             ServiceResult<Game> result = await _gameService.GetByIdAsync(id);
 
-            if (!result.Success) return NotFound(RespuestaFactory.Fail(result.Message, 404));
+            return StatusCode(result.Status, result);
 
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
         }
 
         [HttpPost]
@@ -45,9 +41,8 @@ namespace SF_API.Controllers
         {
             ServiceResult<Game> result = await _gameService.AddAsync(createGame);
 
-            if (!result.Success) return BadRequest(RespuestaFactory.Fail(result.Message, 400));
+            return StatusCode(result.Status, result);
 
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
         }
 
         [HttpPut("{id}")]
@@ -55,26 +50,17 @@ namespace SF_API.Controllers
         {
             ServiceResult<Game> result = await _gameService.UpdateAsync(id, updateGame);
 
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
+            return StatusCode(result.Status, result);
 
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGameAsync(int id)
         {
             ServiceResult<Game> result = await _gameService.DeleteAsync(id);
-            if (!result.Success)
-            {
-                if (result.ErrorType == ErrorType.NotFound) return NotFound(RespuestaFactory.Fail(result.Message, 404));
-                return BadRequest(RespuestaFactory.Fail(result.Message, 400));
-            }
-            return Ok(RespuestaFactory.Ok(result.Message, result.Data));
+
+            return StatusCode(result.Status, result);
+
         }
 
 
