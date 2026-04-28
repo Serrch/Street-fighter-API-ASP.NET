@@ -28,6 +28,15 @@ namespace SF_API.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetByEntityIdAndType(int entityId, EntityType type)
+        {
+            ServiceResult<List<Image>> result = await _imageService.GetByEntityIdAndType(entityId, type);
+            return StatusCode(result.Status, result);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CreateImageAsync(CreateImageDTO createImage)
         {
@@ -37,7 +46,7 @@ namespace SF_API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateImageAsync(int id, [FromBody] CreateImageDTO updateImage)
+        public async Task<IActionResult> UpdateImageAsync(int id, CreateImageDTO updateImage)
         {
             ServiceResult<Image> result = await _imageService.UpdateAsync(id, updateImage);
 

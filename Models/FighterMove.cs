@@ -24,9 +24,11 @@ namespace SF_API.Models
         public bool IsSuperMove { get; set; }
 
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
         [JsonIgnore]

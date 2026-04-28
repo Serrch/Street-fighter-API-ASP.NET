@@ -24,9 +24,11 @@ namespace SF_API.Models
         public string Description { get; set; } = string.Empty;
 
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
         public virtual ICollection<FighterMove> FighterMoves { get; set; } = new List<FighterMove>();

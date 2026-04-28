@@ -40,22 +40,54 @@ namespace SF_API.Services
             return ServiceResult<Image>.Ok(imageById, "Imagen obtenida con exito");
         }
 
+        public async Task<ServiceResult<List<Image>>> GetByEntityIdAndType(int entityId, EntityType type)
+        {
+            List<Image> images = await _context.Images
+                .Where(i => i.EntityId == entityId && i.EntityType == type)
+                .ToListAsync();
+
+            if (images.Count == 0)
+                return ServiceResult<List<Image>>.Fail(
+                    $"Lista de imagenes vacia para {type} con la ID: {entityId}",
+                    ErrorType.NotFound
+                );
+
+            return ServiceResult<List<Image>>.OkFinded(images, "Imagenes");
+        }
+
         public async Task<ServiceResult<Image>> AddAsync(CreateImageDTO imageDTO)
         {
             string? validateImg = await ValidateImageAsync(imageDTO);
 
-            if (validateImg != null) return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
+            if (validateImg != null)
+                return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
 
             bool exist = await entityExist(imageDTO);
 
-            if (!exist) return ServiceResult<Image>.FailAction("crear", "imagen");
+            if (!exist)
+                return ServiceResult<Image>.FailAction("crear", "imagen");
+
+            var existingImage = await _context.Images
+                .FirstOrDefaultAsync(i =>
+                    i.EntityId == imageDTO.EntityId &&
+                    i.EntityType == imageDTO.EntityType &&
+                    i.ImageType == imageDTO.ImageType);
+
+            if (existingImage != null)
+            {
+                var oldPath = Path.Combine(_env.WebRootPath, existingImage.ImagePath);
+                DeleteImageFile(oldPath);
+
+                _context.Images.Remove(existingImage);
+                await _context.SaveChangesAsync();
+            }
 
             ResponseImage imageCreated = await createImage(imageDTO);
 
-            if (!imageCreated.response) return ServiceResult<Image>.Fail("Ocurrio un error al guardar la imagen localmente", ErrorType.ActionError);
+            if (!imageCreated.response)
+                return ServiceResult<Image>.Fail("Error al guardar imagen", ErrorType.ActionError);
 
             Image image = _mapper.Map<Image>(imageDTO);
-
             image.ImagePath = imageCreated.imagePath;
 
             try
@@ -65,36 +97,73 @@ namespace SF_API.Services
             }
             catch
             {
-                string absolutePath = Path.Combine(_env.WebRootPath, imageCreated.imagePath);
-                if (File.Exists(absolutePath))
-                    File.Delete(absolutePath);
+                var newPath = Path.Combine(_env.WebRootPath, imageCreated.imagePath);
+                DeleteImageFile(newPath);
 
                 return ServiceResult<Image>.FailActionExcepcion("crear", "imagen");
             }
 
             return ServiceResult<Image>.OkAction("crear", "imagen");
-
         }
+
+        //public async Task<ServiceResult<Image>> UpdateAsync(int id, CreateImageDTO updatedImage)
+        //{
+        //    string? validateImg = await ValidateImageAsync(updatedImage);
+
+        //    if (validateImg != null)
+        //        return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
+
+        //    Image? image = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
+
+        //    if (image == null)
+        //        return ServiceResult<Image>.FailIdNotFound("imagen", id);
+
+        //    if (!await entityExist(updatedImage))
+        //        return ServiceResult<Image>.FailAction("actualizar", "imagen");
+
+        //    string oldImagePath = image.ImagePath;
+
+        //    ResponseImage newImage = await createImage(updatedImage);
+
+        //    if (!newImage.response)
+        //        return ServiceResult<Image>.FailAction("actualizar", "imagen");
+
+        //    _mapper.Map(updatedImage, image);
+        //    image.ImagePath = newImage.imagePath;
+        //    image.UpdatedOn = DateTime.UtcNow;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch
+        //    {
+        //        string newAbsolutePath = Path.Combine(_env.WebRootPath, newImage.imagePath);
+        //        DeleteImageFile(newAbsolutePath);
+
+        //        return ServiceResult<Image>.FailActionExcepcion("actualizar", "imagen");
+        //    }
+
+        //    string oldAbsolutePath = Path.Combine(_env.WebRootPath, oldImagePath);
+        //    DeleteImageFile(oldAbsolutePath);
+
+        //    return ServiceResult<Image>.OkAction(image, "actualizar", "imagen");
+        //}
 
         public async Task<ServiceResult<Image>> UpdateAsync(int id, CreateImageDTO updatedImage)
         {
             string? validateImg = await ValidateImageAsync(updatedImage);
-
             if (validateImg != null)
                 return ServiceResult<Image>.Fail(validateImg, ErrorType.Validation);
 
             Image? image = await _context.Images.FirstOrDefaultAsync(i => i.IdImage == id);
-
             if (image == null)
                 return ServiceResult<Image>.FailIdNotFound("imagen", id);
 
             if (!await entityExist(updatedImage))
                 return ServiceResult<Image>.FailAction("actualizar", "imagen");
 
-            string oldImagePath = image.ImagePath;
-
             ResponseImage newImage = await createImage(updatedImage);
-
             if (!newImage.response)
                 return ServiceResult<Image>.FailAction("actualizar", "imagen");
 
@@ -114,12 +183,8 @@ namespace SF_API.Services
                 return ServiceResult<Image>.FailActionExcepcion("actualizar", "imagen");
             }
 
-            string oldAbsolutePath = Path.Combine(_env.WebRootPath, oldImagePath);
-            DeleteImageFile(oldAbsolutePath);
-
             return ServiceResult<Image>.OkAction(image, "actualizar", "imagen");
         }
-
 
         public async Task<ServiceResult<bool>> DeleteByIdAsync(int id)
         {
@@ -328,6 +393,7 @@ namespace SF_API.Services
 
             return null;
         }
+
     }
 
 }

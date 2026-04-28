@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SF_API.Models
 {
@@ -31,10 +32,13 @@ namespace SF_API.Models
         [StringLength(100, ErrorMessage = "El campo nacionalidad no puede tener mas de 100 caracteres")]
         public string Nationality { get; set; } = string.Empty;
 
+        
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         [DataType(DataType.DateTime)]
+        [JsonIgnore]
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
         public virtual ICollection<FighterVersion> FighterVersions { get; set; } = new List<FighterVersion>();
